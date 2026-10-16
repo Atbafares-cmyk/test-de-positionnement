@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Quel gestionnaire du temps êtes-vous ?</title>
+<meta name="description" content="Douze situations concrètes pour repérer votre façon de gérer le temps. Trois minutes, aucun résultat n'est enregistré.">
+<meta name="theme-color" content="#101010">
+<script>
+/* applique le choix d'affichage avant le rendu, pour eviter le clignotement */
+(function(){try{var t=localStorage.getItem("23ms-theme");if(t==="clair"||t==="sombre"){document.documentElement.setAttribute("data-theme",t);}}catch(e){}})();
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700;9..40,900&display=swap" rel="stylesheet">
+<style>
+:root{
+  /* sombre par defaut : charte 23 MindSet */
+  --noir:#101010;
+  --framboise:#E25667;
+  --framboise-sourd:#8a3340;
+  --craie:#f2efec;
+  --craie-sourd:#8d8884;
+  --filet:#2e2c2b;
+  --accent-plein:#E25667;
+  --accent-survol:#ef6a7a;
+  --sur-accent:#101010;
+  font-family:"DM Sans","Segoe UI",system-ui,-apple-system,sans-serif;
+}
+/* le systeme est en clair et rien n'a ete choisi a la main */
+@media (prefers-color-scheme:light){
+  :root:not([data-theme="sombre"]){
+    --noir:#FAF8F6;
+    --framboise:#C2374A;
+    --framboise-sourd:#EFA3AE;
+    --craie:#15110F;
+    --craie-sourd:#6B6560;
+    --filet:#DED8D2;
+  }
+}
+/* choix manuel : il prend le dessus */
+:root[data-theme="clair"]{
+  --noir:#FAF8F6;
+  --framboise:#C2374A;
+  --framboise-sourd:#EFA3AE;
+  --craie:#15110F;
+  --craie-sourd:#6B6560;
+  --filet:#DED8D2;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{
+  background:var(--noir);
+  color:var(--craie);
+  font-size:17px;
+  line-height:1.45;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+  overflow-x:hidden;
+}
+.wrap{max-width:33rem;margin:0 auto;padding:0 1.25rem;min-height:100%;display:flex;flex-direction:column}
+
+/* ---------- graduations ---------- */
+.jauge{display:flex;gap:3px;padding:1.4rem 0 .5rem;align-items:flex-end;height:2.6rem}
+.tick{flex:1;height:8px;background:var(--filet);transition:height .25s ease,background .25s ease}
+.tick.faite{background:var(--framboise-sourd);height:8px}
+.tick.ici{background:var(--accent-plein);height:20px}
+.compteur{font-size:.8rem;letter-spacing:.04em;color:var(--craie-sourd);padding-bottom:1.6rem}
+
+/* ---------- accueil ---------- */
+.accueil{flex:1;display:flex;flex-direction:column;justify-content:center;padding:3rem 0}
+.accueil h1{
+  font-size:clamp(2.1rem,9vw,3rem);font-weight:900;line-height:1.02;
+  letter-spacing:-.035em;margin-bottom:1.5rem;
+}
+.accueil h1 em{font-style:normal;color:var(--framboise)}
+.intro{color:var(--craie-sourd);max-width:28rem;margin-bottom:.6rem}
+.intro strong{color:var(--craie);font-weight:500}
+.lede{margin-bottom:2.4rem}
+
+/* ---------- question ---------- */
+.question{flex:1;display:flex;flex-direction:column;padding-bottom:2rem}
+.situation{
+  font-size:clamp(1.25rem,5.4vw,1.6rem);font-weight:700;line-height:1.22;
+  letter-spacing:-.02em;margin:.4rem 0 1.8rem;
+}
+.reponses{border-top:1px solid var(--filet)}
+.rep{
+  display:flex;gap:.95rem;align-items:flex-start;width:100%;text-align:left;
+  background:none;border:0;border-bottom:1px solid var(--filet);
+  color:var(--craie);font:inherit;font-size:1rem;line-height:1.35;
+  padding:1.05rem .2rem;cursor:pointer;
+}
+.puce{
+  flex:0 0 auto;width:13px;height:13px;margin-top:.24rem;border-radius:50%;
+  border:1.5px solid var(--craie-sourd);transition:background .15s,border-color .15s;
+}
+.rep:hover .puce,.rep:focus-visible .puce{border-color:var(--accent-plein)}
+.rep.pris .puce{background:var(--accent-plein);border-color:var(--accent-plein)}
+.rep:focus-visible{outline:2px solid var(--framboise);outline-offset:2px}
+
+.pied{padding-top:1.6rem}
+.retour{
+  background:none;border:0;color:var(--craie-sourd);font:inherit;font-size:.9rem;
+  padding:.5rem 0;cursor:pointer;
+}
+.retour:hover{color:var(--craie)}
+
+/* ---------- bouton ---------- */
+.bouton{
+  display:inline-block;background:var(--accent-plein);color:var(--sur-accent);
+  font:inherit;font-weight:700;font-size:1.05rem;border:0;
+  padding:1rem 2rem;cursor:pointer;width:100%;
+  transition:background .15s;
+}
+.bouton:hover{background:var(--accent-survol)}
+.bouton:focus-visible{outline:2px solid var(--craie);outline-offset:3px}
+.bouton.creux{background:none;color:var(--craie-sourd);border:1px solid var(--filet);font-weight:500}
+.bouton.creux:hover{color:var(--craie);border-color:var(--craie-sourd);background:none}
+
+/* ---------- resultat ---------- */
+.resultat{padding:2rem 0 3rem;flex:1}
+.surtitre{font-size:.82rem;color:var(--craie-sourd);letter-spacing:.02em;margin-bottom:.5rem}
+.nom{
+  font-size:clamp(2.3rem,11vw,3.6rem);font-weight:900;line-height:.98;
+  letter-spacing:-.04em;color:var(--framboise);margin-bottom:1.1rem;
+}
+.resume{font-size:1.1rem;line-height:1.4;margin-bottom:2.4rem;max-width:30rem}
+.volet{margin-bottom:2.1rem}
+.volet h2{
+  font-size:1.05rem;font-weight:700;margin-bottom:.55rem;
+  padding-bottom:.45rem;border-bottom:2px solid var(--accent-plein);display:inline-block;
+}
+.volet p{color:var(--craie);max-width:30rem}
+.volet.cout h2{border-color:var(--filet)}
+.volet.cout p{color:var(--craie-sourd)}
+.leviers{list-style:none;counter-reset:l}
+.leviers li{
+  counter-increment:l;display:flex;gap:.85rem;padding:.8rem 0;
+  border-bottom:1px solid var(--filet);
+}
+.leviers li::before{
+  content:counter(l);color:var(--framboise);font-weight:700;font-size:.95rem;
+  flex:0 0 1rem;line-height:1.45;
+}
+.secondaire{
+  color:var(--craie-sourd);font-size:.95rem;border-left:2px solid var(--filet);
+  padding-left:.95rem;margin-bottom:2.4rem;
+}
+.secondaire b{color:var(--craie);font-weight:700}
+.actions{display:flex;flex-direction:column;gap:.7rem;margin-top:.6rem}
+.signature{
+  margin-top:3rem;padding-top:1.2rem;border-top:1px solid var(--filet);
+  font-size:.8rem;color:var(--craie-sourd);
+}
+/* ---------- barre haute ---------- */
+.barre{
+  display:flex;align-items:center;justify-content:space-between;gap:1rem;
+  padding:1rem 0 .2rem;
+}
+.marque{font-size:.78rem;font-weight:700;letter-spacing:.06em;color:var(--craie-sourd)}
+.theme{
+  display:inline-flex;align-items:center;gap:.5rem;
+  background:none;border:1px solid var(--filet);color:var(--craie-sourd);
+  font:inherit;font-size:.78rem;font-weight:500;
+  padding:.4rem .7rem;cursor:pointer;transition:color .15s,border-color .15s;
+}
+.theme:hover{color:var(--craie);border-color:var(--craie-sourd)}
+.theme:focus-visible{outline:2px solid var(--accent-plein);outline-offset:2px}
+.pastille{
+  width:11px;height:11px;border-radius:50%;
+  border:1.5px solid currentColor;background:linear-gradient(90deg,currentColor 50%,transparent 50%);
+}
+
+/* ---------- pied legal ---------- */
+.pied-legal{
+  margin-top:auto;padding:2rem 0 2.2rem;
+  border-top:1px solid var(--filet);
+  font-size:.78rem;line-height:1.5;color:var(--craie-sourd);
+}
+.confid{margin-bottom:.9rem}
+.confid b{color:var(--craie);font-weight:700}
+.ml{margin-bottom:.9rem}
+.ml summary{
+  cursor:pointer;color:var(--craie-sourd);padding:.3rem 0;
+  text-decoration:underline;text-underline-offset:3px;
+}
+.ml summary:hover{color:var(--craie)}
+.ml summary:focus-visible{outline:2px solid var(--accent-plein);outline-offset:2px}
+.ml-corps{padding:.6rem 0 .2rem}
+.ml-corps h3{
+  font-size:.78rem;font-weight:700;color:var(--craie);
+  margin:.9rem 0 .2rem;
+}
+.ml-corps h3:first-child{margin-top:0}
+.ml-corps p{margin-bottom:.1rem}
+.ml-corps a{color:var(--framboise)}
+.copy{color:var(--craie-sourd);opacity:.8}
+/* pendant les questions, on allege le pied */
+.en-question .confid{display:none}
+.en-question .pied-legal{padding-top:1.4rem}
+
+.hide{display:none}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="barre">
+    <span class="marque">23 MINDSET</span>
+    <button class="theme" id="theme" type="button">
+      <span class="pastille" aria-hidden="true"></span>
+      <span id="theme-mot">Affichage clair</span>
+    </button>
+  </header>
+
+  <!-- ACCUEIL -->
+  <section id="accueil" class="accueil">
+    <h1>Quel gestionnaire du temps <em>êtes-vous ?</em></h1>
+    <p class="intro">Douze situations ordinaires. Pour chacune, choisissez la réaction qui vous ressemble le plus, pas celle qui vous semble la meilleure.</p>
+    <p class="intro lede">Trois minutes. Rien n'est enregistré, rien n'est envoyé. Le résultat s'affiche sur votre écran, et il n'y a pas de mauvais profil.</p>
+    <button class="bouton" id="demarrer">Commencer</button>
+  </section>
+
+  <!-- QUESTION -->
+  <section id="ecran-question" class="hide">
+    <div class="jauge" id="jauge" aria-hidden="true"></div>
+    <p class="compteur" id="compteur"></p>
+    <div class="question">
+      <h1 class="situation" id="situation" tabindex="-1"></h1>
+      <div class="reponses" id="reponses" role="group" aria-labelledby="situation"></div>
+      <div class="pied">
+        <button class="retour hide" id="retour">Revenir à la question précédente</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- RESULTAT -->
+  <section id="ecran-resultat" class="hide">
+    <div class="resultat">
+      <p class="surtitre">Votre profil dominant</p>
+      <h1 class="nom" id="r-nom" tabindex="-1"></h1>
+      <p class="resume" id="r-resume"></p>
+
+      <div class="volet">
+        <h2>Ce que ça vous apporte</h2>
+        <p id="r-force"></p>
+      </div>
+
+      <div class="volet cout">
+        <h2>Ce que ça vous coûte</h2>
+        <p id="r-cout"></p>
+      </div>
+
+      <p class="secondaire" id="r-second"></p>
+
+      <div class="volet">
+        <h2>Trois leviers pour vous</h2>
+        <ul class="leviers" id="r-leviers"></ul>
+      </div>
+
+      <div class="actions">
+        <button class="bouton creux" id="refaire">Refaire le test</button>
+      </div>
+
+      <p class="signature">Auto-diagnostic conçu par Fares ATBA - 23 MindSet, pour la formation Gestion du temps et organisation de ses priorités.</p>
+    </div>
+  </section>
+
+  <footer class="pied-legal">
+    <p class="confid"><b>Aucune donnée n'est conservée.</b> Vos réponses restent dans votre téléphone et disparaissent dès que vous fermez la page. Rien n'est envoyé, rien n'est enregistré, et votre formateur ne reçoit aucun résultat. Ce questionnaire sert uniquement à mieux cerner vos besoins et vos attentes pendant la formation : vous partagez ce que vous voulez, et seulement si vous le souhaitez.</p>
+
+    <details class="ml">
+      <summary>Mentions légales</summary>
+      <div class="ml-corps">
+        <h3>Éditeur</h3>
+        <p>Fares ATBA - 23 MindSet</p>
+        <p>Formateur professionnel d'adultes indépendant</p>
+        <p>Évry-Courcouronnes (91), France</p>
+        <p>atbafares@gmail.com</p>
+
+        <h3>Hébergement</h3>
+        <p>GitHub Pages - GitHub, Inc., 88 Colin P. Kelly Jr. Street, San Francisco, CA 94107, États-Unis.</p>
+
+        <h3>Données personnelles</h3>
+        <p>Ce questionnaire ne collecte aucune donnée personnelle. Il n'utilise ni cookie, ni traceur, ni outil de mesure d'audience. Aucune réponse n'est transmise à un serveur : tout le calcul se fait dans votre navigateur et rien n'est conservé après la fermeture de la page. Aucun traitement au sens du RGPD n'est donc réalisé.</p>
+
+        <h3>Finalité</h3>
+        <p>Outil pédagogique d'auto-positionnement. Il n'a aucune valeur de diagnostic psychologique ni d'évaluation professionnelle. Le résultat vous appartient et sert uniquement de point de départ à votre réflexion pendant la formation.</p>
+
+        <h3>Propriété intellectuelle</h3>
+        <p>Les contenus de cette page (textes, questions, profils, mise en forme) sont la propriété de Fares ATBA - 23 MindSet. Toute reproduction ou diffusion, même partielle, est interdite sans autorisation écrite préalable.</p>
+
+        <h3>Accessibilité</h3>
+        <p>Pour toute difficulté d'accès à ce contenu, écrivez à atbafares@gmail.com : une alternative vous sera proposée.</p>
+      </div>
+    </details>
+
+    <p class="copy">© 2026 - 23 MindSet - Fares ATBA</p>
+  </footer>
+
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  var PROFILS = {
+    P:{
+      nom:"Le Pompier",
+      resume:"Vous fonctionnez à l'urgence. C'est ce qui vous rend précieux quand ça chauffe, et c'est aussi ce qui décide de vos journées à votre place.",
+      force:"Vous êtes redoutable dans l'urgence. Quand il faut parer au plus pressé, on peut compter sur vous : vous savez tout lâcher, arbitrer vite et tenir le choc. Dans beaucoup d'équipes, c'est vous qui évitez que les choses partent en vrille.",
+      cout:"L'urgence décide à votre place. Vous n'avez pas de vision au-delà de la journée en cours, et les sujets importants mais non urgents ne sont jamais traités. Ils finissent par devenir urgents à leur tour, ce qui alimente le cycle.",
+      leviers:[
+        "Laissez sonner une fois avant de répondre. Une seconde d'arrêt suffit à reprendre la décision.",
+        "Bloquez une heure par jour pour les urgences. Elles cesseront d'envahir les onze autres.",
+        "Testez une demi-journée avec les notifications coupées, pour voir ce qui était vraiment urgent."
+      ]
+    },
+    F:{
+      nom:"Le Perfectionniste",
+      resume:"Vous ne rendez rien que vous n'assumez pas. La qualité est votre marque de fabrique, et votre principale dépense de temps.",
+      force:"Votre travail est rarement pris en défaut. On vous confie les sujets sensibles parce qu'on sait que ce sera fait sérieusement, vérifié, tenu. Cette fiabilité vous a construit une réputation qui vous ouvre des portes.",
+      cout:"Vous n'arrivez pas à lâcher. Vous ne déléguez pas, vous sur-investissez des tâches qui ne le méritent pas, et vous repoussez ce que vous ne pouvez pas faire parfaitement. Le temps que vous ajoutez en fin de tâche est souvent celui que personne ne remarquera.",
+      leviers:[
+        "Décidez à l'avance ce qu'est assez bien pour chaque tâche, avant de commencer et non après.",
+        "Confiez une seule chose cette semaine, et ne la reprenez pas derrière.",
+        "Commencez deux minutes au lieu d'attendre d'avoir tout ce qu'il faut pour bien faire."
+      ]
+    },
+    D:{
+      nom:"Le Dispersé",
+      resume:"Vous êtes disponible pour tout le monde. C'est une qualité rare en collectif, et c'est votre journée qui la paie.",
+      force:"Vous êtes ouvert, réactif, jamais enfermé dans votre bulle. Les autres savent qu'ils peuvent venir vous voir, l'information circule par vous, et vous êtes souvent celui qui fait le lien entre des gens qui ne se parlent pas.",
+      cout:"Vous êtes en multitâche permanent, vous dites oui à tout, vous commencez beaucoup et vous terminez peu. Le soir, vous avez couru toute la journée sans savoir ce que vous avez réellement fait.",
+      leviers:[
+        "Une seule boîte pour tout noter, jamais cinq. Les post-it, les mails et la mémoire ne font pas un système.",
+        "Avant chaque oui, demandez-vous à quoi vous êtes en train de dire non.",
+        "Testez une heure de monotâche cette semaine : une seule chose, sans notification, jusqu'au bout."
+      ]
+    },
+    A:{
+      nom:"L'Architecte",
+      resume:"Vous planifiez et vous tenez ce que vous annoncez. Votre système est solide tant que la réalité veut bien s'y conformer.",
+      force:"Vous anticipez, vous découpez, vous tenez vos engagements. Votre agenda est propre et vos délais sont respectés, ce qui vous rend prévisible pour les autres et tranquille pour vous. C'est exactement la compétence que cette journée cherche à développer chez les autres profils.",
+      cout:"Votre plan n'a aucune marge. Le premier imprévu fait tomber l'ensemble, et vous le vivez mal. Vous replanifiez ce qu'il faudrait supprimer, et votre rigueur se retourne contre vous dès que la journée s'écarte du schéma.",
+      leviers:[
+        "Ajoutez quinze minutes de marge après chaque réunion. Un plan sans marge est un pari.",
+        "Repérez l'imprévu qui revient chaque semaine : il n'est plus imprévu, il mérite son créneau.",
+        "Avant de replanifier une tâche pour la troisième fois, demandez-vous si elle doit exister."
+      ]
+    }
+  };
+
+  var Q = [
+    { s:"Vous rédigez un document important. Le téléphone sonne : un collègue, pour une question qui n'a rien d'urgent.",
+      r:[["P","Je décroche, on ne sait jamais"],
+         ["F","Je laisse sonner, je veux finir proprement ce que j'ai commencé"],
+         ["D","Je décroche et on discute un moment"],
+         ["A","Je laisse sonner, je rappellerai sur le créneau prévu pour ça"]] },
+
+    { s:"Il est 17h. Il vous reste une heure et trois choses à faire. Vous n'en ferez qu'une.",
+      r:[["A","Celle que j'avais prévue pour ce créneau"],
+         ["P","Celle dont l'échéance est la plus proche"],
+         ["D","Je commence les trois, on verra bien"],
+         ["F","Celle que je peux terminer entièrement"]] },
+
+    { s:"Votre responsable vous demande un travail en plus pour vendredi. Votre semaine est déjà pleine.",
+      r:[["F","J'accepte, quitte à y passer ma soirée"],
+         ["A","J'accepte et je décale quelque chose d'autre dans mon planning"],
+         ["D","J'accepte, je trouverai bien un moment"],
+         ["P","J'accepte, de toute façon tout est urgent en ce moment"]] },
+
+    { s:"Le matin en arrivant, votre premier réflexe.",
+      r:[["P","J'ouvre ma boîte mail pour voir s'il y a le feu"],
+         ["D","Ça dépend des jours, je n'ai pas vraiment de rituel"],
+         ["A","Je regarde mon agenda et je pose mon plan de journée"],
+         ["F","Je reprends le dossier que je n'ai pas fini hier"]] },
+
+    { s:"On vous demande une note de synthèse pour dans deux semaines.",
+      r:[["D","Je la note quelque part, j'y reviendrai"],
+         ["A","Je la découpe en étapes et je pose les créneaux"],
+         ["P","Je m'y mettrai la veille, c'est là que je suis efficace"],
+         ["F","J'attends d'avoir toute la documentation avant de commencer"]] },
+
+    { s:"Une réunion se termine vingt minutes plus tôt que prévu.",
+      r:[["A","Je passe à ce qui était prévu ensuite"],
+         ["P","Je traite les urgences qui se sont accumulées pendant"],
+         ["F","J'en profite pour reprendre un point que j'ai bâclé"],
+         ["D","J'en profite pour faire un peu de tout"]] },
+
+    { s:"Une tâche que vous venez de terminer est correcte, sans être parfaite.",
+      r:[["F","Ça me gêne, j'y reviendrai si j'ai un moment"],
+         ["P","Je n'y pense déjà plus, il y a la suite"],
+         ["A","Si elle remplit son objectif, elle est terminée"],
+         ["D","Je ne m'en rends pas toujours compte"]] },
+
+    { s:"Vos tâches en cours, aujourd'hui, se trouvent où ?",
+      r:[["D","Des post-it, des mails, des notes sur le téléphone"],
+         ["F","Dans ma tête, je sais ce que j'ai à faire"],
+         ["A","Dans une liste unique, tenue à jour"],
+         ["P","Dans ce qui me tombe dessus au fil de la journée"]] },
+
+    { s:"Un imprévu fait sauter tout votre après-midi.",
+      r:[["A","Ça m'agace, j'ai tout mon plan à refaire"],
+         ["D","Je m'adapte, ça ne change pas grand-chose"],
+         ["F","Je décale, mais je rattrape en fin de journée"],
+         ["P","C'est normal, mes journées ressemblent à ça"]] },
+
+    { s:"Un collègue propose de reprendre une partie de votre dossier.",
+      r:[["P","J'accepte s'il prend ce qui brûle le plus"],
+         ["F","Je préfère le faire moi-même, ce sera plus simple"],
+         ["D","J'accepte volontiers, ça m'enlève une chose"],
+         ["A","J'accepte si je peux lui cadrer précisément la demande"]] },
+
+    { s:"En fin de journée, ce que vous vous dites le plus souvent.",
+      r:[["F","J'ai bien avancé, sur peu de choses"],
+         ["P","J'ai éteint des incendies, l'essentiel attend toujours"],
+         ["A","J'ai fait ce que j'avais prévu, ou presque"],
+         ["D","J'ai couru toute la journée sans savoir ce que j'ai fait"]] },
+
+    { s:"Bloquer deux heures dans votre agenda pour un travail de fond.",
+      r:[["P","Je le fais rarement, et ça saute toujours"],
+         ["A","Je le fais régulièrement, c'est la base"],
+         ["D","Je n'y pense pas vraiment"],
+         ["F","Je le fais, mais je déborde presque toujours"]] }
+  ];
+
+  var ORDRE = ["P","F","D","A"];
+  var reponses = new Array(Q.length).fill(null);
+  var i = 0;
+
+  var el = function(id){ return document.getElementById(id); };
+  var accueil = el("accueil"), ecranQ = el("ecran-question"), ecranR = el("ecran-resultat");
+  var racine = document.documentElement;
+
+  /* ---------- affichage clair / sombre ---------- */
+  function themeActuel(){
+    var choisi = racine.getAttribute("data-theme");
+    if (choisi === "clair" || choisi === "sombre") return choisi;
+    try {
+      return window.matchMedia("(prefers-color-scheme: light)").matches ? "clair" : "sombre";
+    } catch (e) { return "sombre"; }
+  }
+
+  function majTheme(){
+    var actuel = themeActuel();
+    var cible = actuel === "clair" ? "sombre" : "clair";
+    el("theme-mot").textContent = "Affichage " + cible;
+    el("theme").setAttribute("aria-label", "Passer en affichage " + cible);
+    var meta = document.querySelector('meta[name="theme-color"]');
+    if (meta) meta.setAttribute("content", actuel === "clair" ? "#FAF8F6" : "#101010");
+  }
+
+  el("theme").addEventListener("click", function(){
+    var cible = themeActuel() === "clair" ? "sombre" : "clair";
+    racine.setAttribute("data-theme", cible);
+    try { localStorage.setItem("23ms-theme", cible); } catch (e) {}
+    majTheme();
+  });
+
+  try {
+    window.matchMedia("(prefers-color-scheme: light)").addEventListener("change", function(){
+      if (!racine.getAttribute("data-theme")) majTheme();
+    });
+  } catch (e) {}
+
+  majTheme();
+
+  // jauge
+  var jauge = el("jauge");
+  for (var k = 0; k < Q.length; k++) {
+    var t = document.createElement("span");
+    t.className = "tick";
+    jauge.appendChild(t);
+  }
+  var ticks = jauge.children;
+
+  function montrer(section){
+    [accueil, ecranQ, ecranR].forEach(function(s){ s.classList.add("hide"); });
+    section.classList.remove("hide");
+    document.body.classList.toggle("en-question", section === ecranQ);
+  }
+
+  function afficher(){
+    var q = Q[i];
+    el("compteur").textContent = "Question " + (i + 1) + " sur " + Q.length;
+    for (var k = 0; k < ticks.length; k++){
+      ticks[k].className = "tick" + (k < i ? " faite" : (k === i ? " ici" : ""));
+    }
+    el("situation").textContent = q.s;
+
+    var box = el("reponses");
+    box.textContent = "";
+    q.r.forEach(function(opt){
+      var b = document.createElement("button");
+      b.type = "button";
+      b.className = "rep" + (reponses[i] === opt[0] ? " pris" : "");
+      var puce = document.createElement("span");
+      puce.className = "puce";
+      var txt = document.createElement("span");
+      txt.textContent = opt[1];
+      b.appendChild(puce);
+      b.appendChild(txt);
+      b.addEventListener("click", function(){ choisir(opt[0], b); });
+      box.appendChild(b);
+    });
+
+    el("retour").classList.toggle("hide", i === 0);
+    el("situation").focus();
+  }
+
+  function choisir(code, bouton){
+    reponses[i] = code;
+    var freres = el("reponses").children;
+    for (var k = 0; k < freres.length; k++) freres[k].classList.remove("pris");
+    bouton.classList.add("pris");
+    setTimeout(function(){
+      if (i < Q.length - 1){ i++; afficher(); }
+      else { resultat(); }
+    }, 180);
+  }
+
+  function resultat(){
+    var score = {P:0, F:0, D:0, A:0};
+    reponses.forEach(function(c){ if (c) score[c]++; });
+
+    var classe = ORDRE.slice().sort(function(a, b){
+      if (score[b] !== score[a]) return score[b] - score[a];
+      return ORDRE.indexOf(a) - ORDRE.indexOf(b);
+    });
+    var dom = PROFILS[classe[0]], sec = PROFILS[classe[1]];
+
+    el("r-nom").textContent = dom.nom;
+    el("r-resume").textContent = dom.resume;
+    el("r-force").textContent = dom.force;
+    el("r-cout").textContent = dom.cout;
+
+    var second = el("r-second");
+    second.textContent = "";
+    if (score[classe[1]] > 0){
+      second.appendChild(document.createTextNode("En second, vous empruntez aussi à "));
+      var b = document.createElement("b");
+      b.textContent = sec.nom;
+      second.appendChild(b);
+      second.appendChild(document.createTextNode(". Personne n'est d'un seul profil : c'est la combinaison qui décrit votre façon de travailler."));
+    } else {
+      second.appendChild(document.createTextNode("Vos réponses pointent très nettement dans une seule direction. C'est une force claire, et un angle mort tout aussi net."));
+    }
+
+    var ul = el("r-leviers");
+    ul.textContent = "";
+    dom.leviers.forEach(function(t){
+      var li = document.createElement("li");
+      var s = document.createElement("span");
+      s.textContent = t;
+      li.appendChild(s);
+      ul.appendChild(li);
+    });
+
+    montrer(ecranR);
+    window.scrollTo(0, 0);
+    el("r-nom").focus();
+  }
+
+  el("demarrer").addEventListener("click", function(){
+    montrer(ecranQ);
+    afficher();
+  });
+
+  el("retour").addEventListener("click", function(){
+    if (i > 0){ i--; afficher(); }
+  });
+
+  el("refaire").addEventListener("click", function(){
+    reponses = new Array(Q.length).fill(null);
+    i = 0;
+    montrer(ecranQ);
+    afficher();
+    window.scrollTo(0, 0);
+  });
+})();
+</script>
+</body>
+</html>
